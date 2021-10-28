@@ -23,8 +23,8 @@ def open_page(driver, p_num) -> None:
     :param p_num: printer number
     :return: None
     """
-    URL = "https://p" + str(p_num) + ".nolop.org/?#temp"
-    driver.get(URL)
+    url = "https://p" + str(p_num) + ".nolop.org/?#temp"
+    driver.get(url)
     return
 
 
@@ -75,7 +75,7 @@ def is_page_loaded(driver, timeout) -> bool:
     state_status = ''
     while state_status == '':
         try:
-            state_status = get_state_info()['State']
+            state_status = get_state_info(driver)['State']
         except KeyError:
             pass
         sleep(1)
@@ -116,7 +116,8 @@ def get_time_remaining_on_print(state) -> str:
 
 
 def main():
-    driver = setup_driver()
+    driver = setup_driver('./chrome/chromedriver')
+    f = open('states.txt', 'w')
     for i in range(8):
         p = i + 1
         print('Checking p%s' % p)
@@ -126,10 +127,13 @@ def main():
         while not is_page_loaded(driver, 15):
             pass
         print('Loaded page.')
-        state = get_state_info()
+        state = get_state_info(driver)
         print('Print time remaining is: ' + get_time_remaining_on_print(state))
+        f.write('P%s states: '%p+str(state)+'\n')
+        print('All states saved to file.')
+    f.close()
     driver.quit()
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     main()
