@@ -28,14 +28,18 @@ def open_page(driver, p_num) -> None:
     return
 
 
-def login(driver, user, pwd) -> None:
+def login(driver, login_info) -> None:
     """
-    Logs into octoprint
+    Logs into octoprint with credentials stored in two lines
+    of login_info file, seperated by a newline
     :param driver: webdriver
-    :param user: username
-    :param pwd: password
+    :param login_info: filename of credentials (or path)
     :return: None
     """
+    f = open(login_info, 'r')
+    user = f.read().split('\n')[0]
+    pwd = f.read().split('\n')[1]
+
     user_box = driver.find_element(By.ID, "login-user")
     pass_box = driver.find_element(By.ID, 'login-password')
     login_button = driver.find_element(By.ID, 'login-button')
@@ -123,7 +127,7 @@ def main():
         print('Checking p%s' % p)
         open_page(driver, p)
         print('Logging in...')
-        login(driver, 'nolop', '3dprint')
+        login(driver, login_info)
         while not is_page_loaded(driver, 15):
             pass
         print('Loaded page.')
